@@ -91,7 +91,7 @@ def _np_store(fname, key, data):
     storekeys = []
     seperatekeys = []
     for col in data:
-        if True in map(is_array, data[col]):
+        if is_array(data[col][0]):
             seperatekeys.append(col)
         else:
             storekeys.append(col)
@@ -101,9 +101,11 @@ def _np_store(fname, key, data):
     store.put(key, data[storekeys])
     store.close()
 
+    '''Store all numpy columns'''
     store = tbl.openFile(fname, 'a')
+    group = store.createGroup("/" + key, "numpy_cols")
+
     for col in seperatekeys:
-        group = store.createGroup("/" + key, "numpy_cols")
         atom = tbl.Atom.from_dtype(data[col][0].dtype)
         vlarray = store.createVLArray(group, col, atom)
         map(vlarray.append, data[col])
