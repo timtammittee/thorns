@@ -20,6 +20,7 @@ import tables
 
 import numpy as np
 import pandas as pd
+import tables as tbl
 
 
 logger = logging.getLogger('thorns')
@@ -40,7 +41,7 @@ def get_store(workdir='work'):
 
 
 
-def dumpdb(data, name='dump', workdir='work', kwargs=None):
+def dumpdb(data, name='dump', workdir='work', pickle=True ,kwargs=None):
     """Dump data in order to recall the most up-to-date records later.
 
     Parameters
@@ -73,12 +74,40 @@ def dumpdb(data, name='dump', workdir='work', kwargs=None):
     now = datetime.datetime.now()
     key = now.strftime("T%Y%m%d_%H%M%S_%f")
 
-    store = pd.io.pytables.HDFStore(fname, 'a')
-    store[key] = data
+    if pickle == True:
+        store = pd.io.pytables.HDFStore(fname, 'a')
+        store[key] = data
 
+        store.close()
+    else:
+        _np_store(fname, key, data)
+
+
+def _np_store(fname, key, data):
+
+    is_array = lambda d : isinstance(d, np.ndarray)
+
+    '''Find out which which columns contain numpy arrays'''
+    storekeys = []
+    seperatekeys = []
+    for col in data:
+        if True in map(is_array, data[col]):
+            seperatekeys.append(col)
+        else:
+            storekeys.append(col)
+
+    '''Store all non numpy columns'''
+    store = pd.io.pytables.HDFStore(fname, 'a')
+    store.put(key, data[storekeys])
     store.close()
 
-
+    store = tbl.openFile(fname, 'a')
+    for col in seperatekeys:
+        store.createGroup("/" + key, "numpy_cols")
+        group = store.createGroup("/"+key+"/numpy_cols",col)
+        for i,entry in enumerate(data[col]):
+            store.createArray(group,"C" + str(i), entry)
+    store.close()
 
 
 
