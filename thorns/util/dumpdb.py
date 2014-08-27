@@ -163,6 +163,7 @@ def loaddb(name='dump', workdir='work', timestamp=False, load_all=False):
             df = df.reset_index()
             db.append(df)
 
+        store.close()
 
 
 
@@ -178,8 +179,16 @@ def loaddb(name='dump', workdir='work', timestamp=False, load_all=False):
     else:
         last_key = sorted(store.keys())[-1]
         db = store[last_key]
+        store.close()
 
-    store.close()
+        store = tbl.openFile(fname, 'r')
+        group = store.getNode("/"+last_key)
+
+        if hasattr(group, "numpy_cols"):
+            numpy_node = store.getNode("/"+last_key+"/numpy_cols")
+            for cell in numpy_node:
+                name = cell._v_name
+                db[name]=cell.read()
 
 
 
