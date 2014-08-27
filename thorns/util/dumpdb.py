@@ -103,10 +103,10 @@ def _np_store(fname, key, data):
 
     store = tbl.openFile(fname, 'a')
     for col in seperatekeys:
-        store.createGroup("/" + key, "numpy_cols")
-        group = store.createGroup("/"+key+"/numpy_cols",col)
-        for i,entry in enumerate(data[col]):
-            store.createArray(group,"C" + str(i), entry)
+        group = store.createGroup("/" + key, "numpy_cols")
+        atom = tbl.Atom.from_dtype(data[col][0].dtype)
+        vlarray = store.createVLArray(group, col, atom)
+        map(vlarray.append, data[col])
     store.close()
 
 
