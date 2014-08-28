@@ -152,7 +152,8 @@ def loaddb(name='dump', workdir='work', timestamp=False, load_all=False):
         db = []
 
         ### Get all tables from the store
-        for t in sorted(store.keys()):
+        key_list = sorted(store.keys())
+        for t in key_list:
             df = store[t]
 
             # Just want ordered unique values in xkeys (ordered set would
@@ -165,16 +166,25 @@ def loaddb(name='dump', workdir='work', timestamp=False, load_all=False):
 
         store.close()
 
-
+        #store = tbl.openFile(fname, 'r')
+        #for i,key in enumerate(key_list):
+        #    group = store.getNode(key)
+#
+#            if hasattr(group, "numpy_cols"):
+#                numpy_node = store.getNode(key + "/numpy_cols")
+#                for cell in numpy_node:
+#                    name = cell._v_name
+#                    db[i][name] = cell.read()
+#        store.close()
 
         db = pd.concat(db)
 
-        db = db.drop_duplicates(
-            subset=list(xkeys),
-            take_last=True,
-        )
+        #db = db.drop_duplicates(
+        #    subset=list(xkeys),
+        #    take_last=True,
+        #)
 
-        db = db.set_index(list(xkeys))
+        #db = db.set_index(list(xkeys))
 
     else:
         last_key = sorted(store.keys())[-1]
@@ -182,13 +192,14 @@ def loaddb(name='dump', workdir='work', timestamp=False, load_all=False):
         store.close()
 
         store = tbl.openFile(fname, 'r')
-        group = store.getNode("/"+last_key)
+        group = store.getNode("/" + last_key)
 
         if hasattr(group, "numpy_cols"):
-            numpy_node = store.getNode("/"+last_key+"/numpy_cols")
+            numpy_node = store.getNode("/" + last_key + "/numpy_cols")
             for cell in numpy_node:
                 name = cell._v_name
-                db[name]=cell.read()
+                db[name] = cell.read()
+        store.close()
 
 
 
