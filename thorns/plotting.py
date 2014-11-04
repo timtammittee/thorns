@@ -74,7 +74,7 @@ def plot_raster(spike_trains, ax=None, style='k.', **kwargs):
     ax.plot(s, n, style, **kwargs)
     ax.set_xlabel("Time (s)")
     ax.set_xlim( (0, duration) )
-    ax.set_ylabel("Trial Number")
+    ax.set_ylabel("Train Number")
     ax.set_ylim( (-0.5, len(trains)-0.5) )
 
 
@@ -267,7 +267,7 @@ def plot_sac(
 
 
 
-def plot_signal(signal, fs=None, ax=None, **kwargs):
+def plot_signal(signal, fs=None, ax=None, style='', **kwargs):
     """Plot time signal.
 
     Parameters
@@ -276,8 +276,10 @@ def plot_signal(signal, fs=None, ax=None, **kwargs):
         Time signal.
     fs : float, optional
         Sampling freuency of the signal.
-    ax : plt.Axis
+    ax : plt.Axis, optional
         Axis to plot onto.
+    style : str, optional
+        Plotting style string.
 
     Returns
     -------
@@ -303,7 +305,7 @@ def plot_signal(signal, fs=None, ax=None, **kwargs):
 
     ax.set_xlim((t[0],t[-1]))
 
-    ax.plot(t, signal, **kwargs)
+    ax.plot(t, signal, style, **kwargs)
 
     ax.set_xlabel(xlabel)
 

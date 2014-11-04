@@ -93,6 +93,9 @@ def make_trains(data, **kwargs):
         spikes = [spks for spks in data.spiketimes.itervalues()]
         trains = _arrays_to_trains(spikes, **meta)
 
+    elif len(data) == 0:
+        trains = pd.DataFrame(columns=(['spikes'] + meta.keys()))
+
     elif isinstance(data[0], Iterable):
         trains = _arrays_to_trains(data, **meta)
 
@@ -295,7 +298,7 @@ def trim(spike_trains, start=0, stop=None):
 
 
     durations = np.array(spike_trains['duration'])
-    durations[ durations>tmaxs ] = tmaxs[ durations>tmaxs ]
+    durations[ np.array(durations>tmaxs) ] = tmaxs[ np.array(durations>tmaxs) ]
     durations -= tmin
 
 
