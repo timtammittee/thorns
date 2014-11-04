@@ -36,6 +36,7 @@ __author__ = "Marek Rudnicki"
 import random
 import numpy as np
 import pandas as pd
+import copy
 import sys
 
 from collections import Iterable
@@ -248,7 +249,24 @@ def accumulate(spike_trains, ignore=None, keep=None):
 
     return acc
 
+def spike_shift(spike_trains, shift):
+    """Shifts the spiketrain.
 
+    Shifts all spikes by a given time while keeping the duration constant.
+    Spikes shiftet behind the end of the signal are being removed.
+
+    """
+
+    duration = spike_trains['duration'][0]
+
+    shiftet_spikes = copy.deepcopy(spike_trains)
+
+    for i, sp in enumerate(shiftet_spikes['spikes']):
+        shiftet = (sp + shift)
+        shiftet_spikes['spikes'][i] = shiftet[(shiftet >= 0) & (shiftet <= duration)]
+
+
+    return shiftet_spikes
 
 
 def trim(spike_trains, start=0, stop=None):

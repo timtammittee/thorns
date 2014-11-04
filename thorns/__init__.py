@@ -45,6 +45,7 @@ from thorns.spikes import (
     accumulate,
     select_trains,
     trim,
+    spike_shift,
     fold,
 )
 
