@@ -28,9 +28,9 @@ __author__ = "Michael Schutte"
 
 import pandas as pd
 
-HUMAN = {'A': 165.4, 'a': 0.06e3, 'k': 1}
 
-def place_to_frequency(place, species=HUMAN):
+
+def place_to_frequency(place, species='human'):
     """Convert a place on the basilar membrane (distance from the
     cochlear apex in meters) to its center frequency according to
     Greenwood, J. Acoust. Soc. Am. 87(6):2592-2605, 1990.
@@ -49,6 +49,13 @@ def place_to_frequency(place, species=HUMAN):
         results in a column named `f`.
 
     """
+
+    human = {'A': 165.4, 'a': 0.06e3, 'k': 1}
+    gerbil = {'A':400, 'a':2.1, 'k':0.35}
+
+    species_dict = {'human':human, 'gerbil':gerbil}
+
+    species = species_dict[species]
 
     A, a, k = species['A'], species['a'], species['k']
     convert = lambda x: A * (10 ** (a*x) - k)
