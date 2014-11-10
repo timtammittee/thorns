@@ -258,6 +258,18 @@ def spike_shift(spike_trains, shift):
     Shifts all spikes by a given time while keeping the duration constant.
     Spikes shiftet behind the end of the signal are being removed.
 
+    Parameters:
+    -----------
+    spike_trains: pandas.Dataframe
+        The input spiketrains
+    shift: float
+        The shift time in seconds
+
+    Returns:
+    --------
+    pandas.Dataframe
+        A new Dataframe containing the shifted spikes.
+
     """
 
     duration = spike_trains['duration'][0]
