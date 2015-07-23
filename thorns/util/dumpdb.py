@@ -15,6 +15,7 @@ import logging
 from itertools import izip_longest
 import shelve
 import collections
+import time
 
 import tables
 
@@ -82,9 +83,6 @@ def dumpdb(data, name='dump', workdir='work', kwargs=None):
     store.close()
 
 
-
-
-
 def loaddb(name='dump', workdir='work', timestamp=False, load_all=False):
     """Recall dumped data discarding duplicated records.
 
@@ -108,10 +106,6 @@ def loaddb(name='dump', workdir='work', timestamp=False, load_all=False):
 
     """
 
-    if timestamp:
-        raise NotImplementedError("Should add extra columnt with timestamps to the index of the output.")
-
-
     fname = os.path.join(workdir, name+'.h5')
     store = pd.io.pytables.HDFStore(fname, 'r')
 
@@ -132,6 +126,12 @@ def loaddb(name='dump', workdir='work', timestamp=False, load_all=False):
                 xkeys.setdefault(name)
 
             df = df.reset_index()
+
+            # Add a Timestamp to the results 
+            if timestamp:
+                time_s = time.strptime(t[1:], "T%Y%m%d_%H%M%S_%f")
+                df['timestamp'] = datetime.datetime(*(time_s[0:6]))
+                
             dbs.append(df)
 
 
@@ -143,6 +143,11 @@ def loaddb(name='dump', workdir='work', timestamp=False, load_all=False):
         df = store[last_key]
 
         xkeys = df.index.names
+
+        # Add a Timestamp to the results 
+        if timestamp:
+            time_s = time.strptime(last_key[1:], "T%Y%m%d_%H%M%S_%f")
+            df['timestamp'] = datetime.datetime(*(time_s[0:6]))
 
         db = df.reset_index()
 
