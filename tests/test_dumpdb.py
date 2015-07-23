@@ -55,7 +55,7 @@ def test_dump_and_load_single_df(workdir):
 
     assert_frame_equal(actual, expected)
 
-def test_dump_and_load_timestamp(workdir):
+def test_dump_and_load_all_timestamp(workdir):
 
     data1 = pd.DataFrame([
         {'x': 50, 'y': 400, 'f': np.array([1,2])},
@@ -77,6 +77,33 @@ def test_dump_and_load_timestamp(workdir):
 
     db = th.util.loaddb(workdir=workdir,
                         load_all=True,
+                        timestamp=True)
+
+
+    assert 'timestamp' in db
+
+
+def test_dump_and_load_single_timestamp(workdir):
+
+    data1 = pd.DataFrame([
+        {'x': 50, 'y': 400, 'f': np.array([1,2])},
+        {'x': 55, 'y': 400, 'f': np.array([5,5])},
+        {'x': 60, 'y': 400, 'f': np.array([2,3])},
+    ]).set_index(['x','y'])
+
+    data2 = pd.DataFrame([
+        {'x': 50, 'y': 400, 'f': np.array([1,2])},
+        {'x': 60, 'y': 400, 'f': np.array([20,30])},
+    ]).set_index(['x','y'])
+
+
+
+    th.util.dumpdb(data1, workdir=workdir)
+    th.util.dumpdb(data2, workdir=workdir)
+
+
+
+    db = th.util.loaddb(workdir=workdir,
                         timestamp=True)
 
 
