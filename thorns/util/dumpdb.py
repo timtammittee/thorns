@@ -84,26 +84,52 @@ def dumpdb(data, name='dump', workdir='work', kwargs=None):
 
 
 def dbinfo(workdir='work'):
+    '''Get a list of all dumps in the work directory
 
+    This function can be used to query a list of dumps that are
+    currently located in the work directory. It also returns the most
+    current timestamp and the filesize.
+
+    Parameters:
+    -----------
+    workdir: str, optional
+        The directory to look for data dumps. default is ./work
+    
+    Returns:
+    --------
+    pd.DataFrame
+        Data about the dumps found in the work directory
+
+    '''
+    
     #Generate a list of h5 files in workdir
     file_list = []
     for fn in next(os.walk(workdir))[2]:
         if os.path.isfile(os.path.join(workdir, fn)) and fn.endswith('.h5'):
             file_list.append(os.path.join(workdir, fn))
 
+
+    # Scan through the list of filenames and add those which can be
+    # opend to a dataframe. also extract the wanted information and
+    # add it to the df. Tables is used instead of the loaddb function
+    # to save execution time for large files.
     df = pd.DataFrame([])
     for fl in file_list:
-        h5file = tables.open_file(fl, mode = "r")
-        timestamps = [node._v_name for node in h5file.list_nodes('/')]
-        timestamps.sort()
+        try:
+            h5file = tables.open_file(fl, mode = "r")
+            timestamps = [node._v_name for node in h5file.list_nodes('/')]
+            timestamps.sort()
 
-        time_s = time.strptime(timestamps[-1][1:], "%Y%m%d_%H%M%S_%f")
-        df = df.append({'name':fl.split('/')[-1].split('.')[0],
-                        'timestamp': datetime.datetime(*(time_s[0:6])),
-                        'filesize':h5file.get_filesize()}
-                       ,ignore_index=True)
+            time_s = time.strptime(timestamps[-1][1:], "%Y%m%d_%H%M%S_%f")
+            df = df.append({'name':fl.split('/')[-1].split('.')[0],
+                            'timestamp': datetime.datetime(*(time_s[0:6])),
+                            'filesize':h5file.get_filesize()}
+                           ,ignore_index=True)
 
-        h5file.close()
+            h5file.close()
+
+        except:
+            pass
 
     return df
 
