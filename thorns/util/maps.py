@@ -172,11 +172,15 @@ def _multiprocessing_map(func, iterable, cfg):
 
 def _ipython_map(func, iterable, cfg):
 
-    from IPython.parallel import Client
+    import IPython
+
+    if IPython.version_info[0] < 4:
+        from IPython.parallel import Client
+    else:
+        from ipyparallel import Client
 
     rc = Client()
     rc[:].clear()
-
 
 
     ### Make modules for all dependencies on the engines
